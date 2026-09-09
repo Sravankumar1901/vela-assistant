@@ -10,13 +10,13 @@ RAG "brain" plugs into Vera (voice) later.
 - **Multi-tenant & isolated.** Each business has a `tenant_id` + hashed API key; **Postgres Row-Level Security** makes cross-tenant reads impossible.
 - **Audited.** Every message → redaction → retrieval → answer is traced (structured audit log + `conversations` table). No raw PII.
 - **Secured Chat-to-SQL.** Ask questions of live data; a sqlglot safety gate + read-only role block anything but a bounded SELECT.
-- **Fully-hosted, zero-docker stack.** Groq (chat) · Google Gemini (embeddings) · Supabase Postgres + pgvector · FastAPI. The LLM and embeddings are **swappable via env**.
+- **Fully-hosted, zero-docker stack.** Google Gemini (chat **and** embeddings) · Supabase Postgres + pgvector · FastAPI. The LLM and embeddings are **swappable via env** (drop in OpenAI, Groq, etc. with no code change).
 
 ## Stack
 | Piece | Default | Swap via |
 |---|---|---|
-| Chat LLM | **Groq** `llama-3.1-8b-instant` | `LLM_BASE_URL` / `LLM_API_KEY` / `LLM_MODEL` (→ OpenAI `gpt-4o-mini`, etc.) |
-| Embeddings | **Gemini** `text-embedding-004` (768-dim) | `EMBED_BASE_URL` / `EMBED_API_KEY` / `EMBED_MODEL` / `EMBED_PROVIDER` |
+| Chat LLM | **Gemini** `gemini-flash-lite-latest` | `LLM_BASE_URL` / `LLM_API_KEY` / `LLM_MODEL` (→ OpenAI `gpt-4o-mini`, Groq, etc.) |
+| Embeddings | **Gemini** `gemini-embedding-001` (768-dim) | `EMBED_BASE_URL` / `EMBED_API_KEY` / `EMBED_MODEL` / `EMBED_PROVIDER` |
 | Vector store | **Supabase pgvector** | `DATABASE_URL` |
 | Relational + logs | **Supabase Postgres** | `DATABASE_URL` |
 | Read-only SQL role | `vela_readonly` | `READONLY_DATABASE_URL` |
