@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>VELA Admin</title>
+<style>
+  :root{
+    --bg:#0b0b0c; --panel:#131315; --panel2:#1a1a1d; --line:#2a2a2c;
+    --text:#eaeaea; --muted:#8c8c90; --accent:#c9a25a; --accent-dim:#3a3117;
+    --danger:#e06a5a; --ok:#4caf7d;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5}
+  a{color:var(--accent)}
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:16px 24px;border-bottom:1px solid var(--line);position:sticky;top:0;
+    background:rgba(11,11,12,.92);backdrop-filter:blur(6px);z-index:5}
+  header h1{font-size:18px;margin:0;letter-spacing:.3px}
+  header h1 b{color:var(--accent)}
+  .wrap{max-width:1040px;margin:0 auto;padding:24px}
+  .row{display:flex;gap:20px;flex-wrap:wrap}
+  .col{flex:1 1 300px;min-width:0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:0 0 12px}
+  h3{font-size:16px;margin:0}
+  .muted{color:var(--muted)}
+  .small{font-size:12px}
+  label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
+  input,select,button,textarea{font:inherit}
+  input,select,textarea{width:100%;background:var(--panel2);border:1px solid var(--line);
+    color:var(--text);border-radius:8px;padding:9px 11px;outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+  button{cursor:pointer;border:1px solid var(--line);background:var(--panel2);color:var(--text);
+    border-radius:8px;padding:8px 12px;font-size:13px}
+  button:hover{border-color:var(--accent)}
+  button.primary{background:var(--accent);color:#111;border-color:var(--accent);font-weight:600}
+  button.primary:hover{filter:brightness(1.06)}
+  button.ghost{background:transparent}
+  button.danger{color:var(--danger);border-color:#40292a}
+  button.danger:hover{border-color:var(--danger)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .badge{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:2px 9px;
+    border:1px solid var(--line);color:var(--muted)}
+  .badge.chat{color:#7db4e0;border-color:#263a48}
+  .badge.voice{color:#c99ae0;border-color:#3a2848}
+  .st{font-size:11px;font-weight:600;text-transform:capitalize}
+  .st.active{color:var(--ok)} .st.paused{color:var(--accent)}
+  .st.draft{color:var(--muted)} .st.disabled{color:var(--danger)}
+  .client-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:4px}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:middle}
+  .agent{border-top:1px solid var(--line);padding:12px 0 4px;margin-top:12px}
+  .agent:first-of-type{border-top:0;margin-top:8px}
+  .agent-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .usage{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0 2px}
+  .usage .u{font-size:12px}
+  .usage .u b{color:var(--text)} .usage .u span{color:var(--muted)}
+  .empty{color:var(--muted);font-size:13px;padding:8px 0}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--panel2);
+    border:1px solid var(--accent);color:var(--text);padding:10px 16px;border-radius:10px;
+    font-size:13px;z-index:50;box-shadow:0 8px 30px rgba(0,0,0,.5);max-width:90vw}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;
+    justify-content:center;z-index:40;padding:20px}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:14px;max-width:560px;
+    width:100%;padding:22px}
+  .modal h3{margin-bottom:8px}
+  .warn{background:var(--accent-dim);border:1px solid #5a4a1f;color:#f0dca8;border-radius:8px;
+    padding:10px 12px;font-size:13px;margin:12px 0}
+  .secretbox{display:flex;gap:8px;margin-top:6px}
+  .secretbox code{flex:1;background:#000;border:1px solid var(--line);border-radius:8px;padding:10px 12px;
+    font-size:13px;word-break:break-all;color:var(--accent)}
+  pre{background:#000;border:1px solid var(--line);border-radius:8px;padding:12px;overflow:auto;
+    font-size:12px;color:#cfe;white-space:pre-wrap;word-break:break-all;margin:6px 0 0}
+  .tokenbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .tokenbar input{max-width:280px}
+  .hide{display:none}
+  .banner{background:#3a1f1f;border:1px solid #6a2f2f;color:#f0c4c4;border-radius:10px;padding:12px 14px;margin-bottom:16px}
+</style>
+</head>
+<body>
+<header>
+  <h1><b>VELA</b> Admin</h1>
+  <div class="tokenbar">
+    <span id="tokState" class="small muted"></span>
+    <input id="tokInput" type="password" placeholder="Admin token (X-Admin-Token)" autocomplete="off"/>
+    <button id="tokSave" class="primary">Save</button>
+    <button id="tokClear" class="ghost">Forget</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="banner"></div>
+
+  <div class="row">
+    <!-- Left: clients + agents -->
+    <div class="col" style="flex:2 1 560px">
+      <h2>Clients</h2>
+      <div id="clients"><div class="empty">Loading…</div></div>
+    </div>
+
+    <!-- Right: create forms -->
+    <div class="col">
+      <div class="card">
+        <h2>New client</h2>
+        <label>Name</label>
+        <input id="c_name" placeholder="Acme Beauty Studio"/>
+        <label>Slug (lowercase, a-z 0-9 -)</label>
+        <input id="c_slug" placeholder="acme-beauty"/>
+        <label>Contact email</label>
+        <input id="c_email" placeholder="owner@acme.com"/>
+        <label>Brand accent</label>
+        <input id="c_accent" value="#c9a25a"/>
+        <div class="btnrow"><button id="c_create" class="primary">Create client</button></div>
+      </div>
+
+      <div class="card">
+        <h2>New agent</h2>
+        <label>Client</label>
+        <select id="a_client"></select>
+        <label>Type</label>
+        <select id="a_type"><option value="chat">chat</option><option value="voice">voice</option></select>
+        <label>Name</label>
+        <input id="a_name" placeholder="Website Chat"/>
+        <label>Plan (optional)</label>
+        <select id="a_plan"><option value="">— none —</option></select>
+        <div class="btnrow"><button id="a_create" class="primary">Create agent</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modalRoot"></div>
+<div id="toastRoot"></div>
+
+<script>
+"use strict";
+const TOKEN_KEY = "vela_admin_token";
+let PLANS = [];
+let CLIENTS = [];
+
+// ---- token handling -------------------------------------------------------
+function getToken(){ try{ return localStorage.getItem(TOKEN_KEY) || ""; }catch(e){ return ""; } }
+function setToken(t){ try{ localStorage.setItem(TOKEN_KEY, t); }catch(e){} }
+function clearToken(){ try{ localStorage.removeItem(TOKEN_KEY); }catch(e){} }
+
+function refreshTokState(){
+  const t = getToken();
+  document.getElementById("tokState").textContent = t ? "token set" : "no token";
+  document.getElementById("tokState").style.color = t ? "var(--ok)" : "var(--danger)";
+}
+
+// ---- fetch helper ---------------------------------------------------------
+async function api(path, opts){
+  opts = opts || {};
+  const headers = Object.assign({"Content-Type":"application/json","X-Admin-Token":getToken()}, opts.headers||{});
+  let resp;
+  try{
+    resp = await fetch(path, Object.assign({}, opts, {headers}));
+  }catch(e){
+    throw {status:0, detail:"network error — is the server running?"};
+  }
+  if(resp.status === 503){ showBanner("Admin portal is disabled on the server (ADMIN_TOKEN unset)."); throw {status:503, detail:"portal disabled"}; }
+  if(resp.status === 401){ showBanner("Unauthorized — enter a valid admin token above."); throw {status:401, detail:"unauthorized"}; }
+  let data = null;
+  try{ data = await resp.json(); }catch(e){}
+  if(!resp.ok){ throw {status:resp.status, detail:(data && data.detail) || ("HTTP "+resp.status)}; }
+  clearBanner();
+  return data;
+}
+
+// ---- ui helpers -----------------------------------------------------------
+function el(tag, attrs, children){
+  const n = document.createElement(tag);
+  if(attrs) for(const k in attrs){
+    if(k==="class") n.className=attrs[k];
+    else if(k==="text") n.textContent=attrs[k];
+    else if(k.startsWith("on")) n.addEventListener(k.slice(2), attrs[k]);
+    else n.setAttribute(k, attrs[k]);
+  }
+  (children||[]).forEach(c=>{ if(c) n.appendChild(typeof c==="string"?document.createTextNode(c):c); });
+  return n;
+}
+function toast(msg){
+  const t = el("div",{class:"toast",text:msg});
+  document.getElementById("toastRoot").appendChild(t);
+  setTimeout(()=>t.remove(), 2600);
+}
+function showBanner(msg){ document.getElementById("banner").innerHTML=""; document.getElementById("banner").appendChild(el("div",{class:"banner",text:msg})); }
+function clearBanner(){ document.getElementById("banner").innerHTML=""; }
+
+function money(n){ return "$"+Number(n||0).toFixed(2); }
+
+// ---- modal ----------------------------------------------------------------
+function closeModal(){ document.getElementById("modalRoot").innerHTML=""; }
+function showModal(nodes){
+  const modal = el("div",{class:"modal"}, nodes.concat([
+    el("div",{class:"btnrow"},[ el("button",{class:"ghost",text:"Close",onclick:closeModal}) ])
+  ]));
+  const bg = el("div",{class:"modal-bg",onclick:(e)=>{ if(e.target===bg) closeModal(); }},[modal]);
+  document.getElementById("modalRoot").innerHTML="";
+  document.getElementById("modalRoot").appendChild(bg);
+}
+function copyText(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>toast("Copied")).catch(()=>toast("Copy failed — select manually"));
+  } else { toast("Copy not available — select manually"); }
+}
+
+// ---- render ---------------------------------------------------------------
+function agentNode(a){
+  const badge = el("span",{class:"badge "+(a.type==="chat"?"chat":"voice"),text:a.type});
+  const st = el("span",{class:"st "+a.status,text:a.status});
+  const plan = el("span",{class:"small muted",text: a.plan_name ? ("· "+a.plan_name) : "· no plan"});
+
+  const top = el("div",{class:"agent-top"},[
+    badge, el("b",{text:a.name}), st, plan
+  ]);
+
+  const u = a.usage||{};
+  const usage = el("div",{class:"usage"},[
+    el("div",{class:"u"},[ el("b",{text:String(u.chat_requests||0)}), " ", el("span",{text:"chat reqs"}) ]),
+    el("div",{class:"u"},[ el("b",{text:String(u.voice_minutes||0)}), " ", el("span",{text:"voice min"}) ]),
+    el("div",{class:"u"},[ el("b",{text:money(u.cost_usd)}), " ", el("span",{text:"cost (period)"}) ]),
+    el("div",{class:"u"},[ el("span",{text:(a.has_widget_token?"● widget token":"○ no widget token")+" · "+(a.api_key_count||0)+" api key(s)"}) ])
+  ]);
+
+  const isActive = a.status==="active";
+  const toggle = el("button",{
+    class: isActive? "danger":"",
+    text: isActive? "Pause":"Activate",
+    onclick:()=>setStatus(a.id, isActive?"paused":"active")
+  });
+  const wtBtn = el("button",{text:"Widget token",onclick:()=>genWidgetToken(a.id)});
+  const keyBtn = el("button",{text:"API key",onclick:()=>genApiKey(a.id)});
+  const btns = [toggle, wtBtn, keyBtn];
+  if(a.type==="chat") btns.push(el("button",{text:"Copy embed",onclick:()=>copyEmbed(a.id)}));
+
+  return el("div",{class:"agent"},[ top, usage, el("div",{class:"btnrow"}, btns) ]);
+}
+
+function statusColor(s){ return s==="active"?"var(--ok)": s==="paused"?"var(--accent)": s==="churned"?"var(--danger)":"var(--muted)"; }
+
+function clientNode(c){
+  const head = el("div",{class:"client-head"},[
+    el("h3",{},[ el("span",{class:"dot",style:"background:"+statusColor(c.status)}), c.name ]),
+    el("span",{class:"small muted",text: c.status+" · "+c.slug})
+  ]);
+  const meta = el("div",{class:"small muted",text: (c.contact_email||"no contact email")});
+  const kids=[head, meta];
+  if(!c.agents || !c.agents.length){ kids.push(el("div",{class:"empty",text:"No agents yet — create one on the right."})); }
+  else c.agents.forEach(a=>kids.push(agentNode(a)));
+  return el("div",{class:"card"}, kids);
+}
+
+function renderClients(){
+  const host = document.getElementById("clients");
+  host.innerHTML="";
+  if(!CLIENTS.length){ host.appendChild(el("div",{class:"empty",text:"No clients yet."})); }
+  else CLIENTS.forEach(c=>host.appendChild(clientNode(c)));
+
+  // client picker for the new-agent form
+  const sel = document.getElementById("a_client");
+  const cur = sel.value;
+  sel.innerHTML="";
+  CLIENTS.forEach(c=> sel.appendChild(el("option",{value:c.id,text:c.name+" ("+c.slug+")"})));
+  if(cur) sel.value=cur;
+}
+
+function renderPlans(){
+  const sel = document.getElementById("a_plan");
+  sel.innerHTML="";
+  sel.appendChild(el("option",{value:"",text:"— none —"}));
+  PLANS.forEach(p=> sel.appendChild(el("option",{value:p.id,text:p.name+" ("+p.applies_to+", "+money(p.price_monthly_usd)+"/mo)"})));
+}
+
+// ---- actions --------------------------------------------------------------
+async function loadAll(){
+  if(!getToken()){ document.getElementById("clients").innerHTML='<div class="empty">Enter your admin token above to load data.</div>'; return; }
+  try{
+    const [clients, plans] = await Promise.all([ api("/admin/api/clients"), api("/admin/api/plans") ]);
+    CLIENTS = clients || []; PLANS = plans || [];
+    renderPlans(); renderClients();
+  }catch(e){ if(e.status!==401 && e.status!==503) toast("Load failed: "+e.detail); }
+}
+
+async function createClient(){
+  const name=v("c_name"), slug=v("c_slug");
+  if(!name || !slug){ toast("Name and slug are required"); return; }
+  const body={ name, slug, contact_email:v("c_email")||null, brand_accent:v("c_accent")||"#c9a25a" };
+  try{
+    await api("/admin/api/clients",{method:"POST",body:JSON.stringify(body)});
+    toast("Client created"); ["c_name","c_slug","c_email"].forEach(id=>document.getElementById(id).value="");
+    await loadAll();
+  }catch(e){ toast("Create failed: "+e.detail); }
+}
+
+async function createAgent(){
+  const client_id=v("a_client"), name=v("a_name"), type=v("a_type"), plan_id=v("a_plan")||null;
+  if(!client_id){ toast("Pick a client (create one first)"); return; }
+  if(!name){ toast("Agent name is required"); return; }
+  try{
+    await api("/admin/api/agents",{method:"POST",body:JSON.stringify({client_id,type,name,plan_id})});
+    toast("Agent created"); document.getElementById("a_name").value="";
+    await loadAll();
+  }catch(e){ toast("Create failed: "+e.detail); }
+}
+
+async function setStatus(agentId, status){
+  try{
+    await api("/admin/api/agents/"+agentId+"/status",{method:"POST",body:JSON.stringify({status})});
+    toast("Status → "+status + (status==="paused"?" (tokens & keys revoked)":""));
+    await loadAll();
+  }catch(e){ toast("Failed: "+e.detail); }
+}
+
+async function genWidgetToken(agentId){
+  const originsRaw = prompt("Allowed origins (comma-separated, e.g. https://acme.com). Leave blank for none:", "");
+  if(originsRaw===null) return;
+  const allowed_origins = originsRaw.split(",").map(s=>s.trim()).filter(Boolean);
+  try{
+    const r = await api("/admin/api/agents/"+agentId+"/widget-token",{method:"POST",body:JSON.stringify({allowed_origins})});
+    showModal([
+      el("h3",{text:"Widget token created"}),
+      el("div",{class:"small muted",text:"This is a PUBLIC token (safe to embed on the client site)."}),
+      el("div",{class:"secretbox"},[ el("code",{text:r.public_token}), el("button",{class:"primary",text:"Copy",onclick:()=>copyText(r.public_token)}) ]),
+      el("div",{class:"small muted",style:"margin-top:8px",text:"Allowed origins: "+((r.allowed_origins||[]).join(", ")||"none")})
+    ]);
+    await loadAll();
+  }catch(e){ toast("Failed: "+e.detail); }
+}
+
+async function genApiKey(agentId){
+  const scope = prompt("API key scope: 'ingest' or 'admin'", "ingest");
+  if(scope===null) return;
+  if(scope!=="ingest" && scope!=="admin"){ toast("Scope must be ingest or admin"); return; }
+  try{
+    const r = await api("/admin/api/agents/"+agentId+"/api-key",{method:"POST",body:JSON.stringify({scope})});
+    showModal([
+      el("h3",{text:"API key created ("+r.scope+")"}),
+      el("div",{class:"warn"},[ "⚠ Save this now — it will NOT be shown again. Only its hash is stored on the server." ]),
+      el("div",{class:"secretbox"},[ el("code",{text:r.api_key}), el("button",{class:"primary",text:"Copy",onclick:()=>copyText(r.api_key)}) ])
+    ]);
+    await loadAll();
+  }catch(e){ toast("Failed: "+e.detail); }
+}
+
+async function copyEmbed(agentId){
+  try{
+    const r = await api("/admin/api/embed-snippet/"+agentId);
+    if(!r.snippet){
+      showModal([ el("h3",{text:"Embed not available"}), el("div",{class:"small muted",text:r.hint||"No snippet."}) ]);
+      return;
+    }
+    showModal([
+      el("h3",{text:"Embed snippet"}),
+      el("div",{class:"small muted",text:"Replace YOUR-ASSISTANT-HOST with your deployed host. data-key is the PUBLIC widget token."}),
+      el("pre",{text:r.snippet}),
+      el("div",{class:"btnrow"},[ el("button",{class:"primary",text:"Copy snippet",onclick:()=>copyText(r.snippet)}) ])
+    ]);
+  }catch(e){ toast("Failed: "+e.detail); }
+}
+
+// ---- small helpers + wiring ----------------------------------------------
+function v(id){ return document.getElementById(id).value.trim(); }
+
+document.getElementById("tokSave").onclick = ()=>{
+  const t=document.getElementById("tokInput").value.trim();
+  if(!t){ toast("Paste a token first"); return; }
+  setToken(t); document.getElementById("tokInput").value=""; refreshTokState(); clearBanner(); loadAll(); toast("Token saved");
+};
+document.getElementById("tokClear").onclick = ()=>{ clearToken(); refreshTokState(); toast("Token forgotten"); document.getElementById("clients").innerHTML='<div class="empty">Enter your admin token above to load data.</div>'; };
+document.getElementById("c_create").onclick = createClient;
+document.getElementById("a_create").onclick = createAgent;
+
+// init
+refreshTokState();
+if(!getToken()){
+  document.getElementById("clients").innerHTML='<div class="empty">Enter your admin token above and click Save to load data.</div>';
+}else{
+  loadAll();
+}
+</script>
+</body>
+</html>

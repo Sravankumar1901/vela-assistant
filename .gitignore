@@ -1,0 +1,19 @@
+# secrets / local env
+.env
+.dev.vars
+*.pem
+*.key
+# python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+# node / cloudflare
+node_modules/
+.wrangler/
+# runtime data & logs
+data/
+*.jsonl
+*.log
+# os
+.DS_Store

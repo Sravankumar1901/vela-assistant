@@ -1,0 +1,16 @@
+# Slim runtime deps for the public Cloudflare Containers deploy (regex-only PII).
+# Presidio + spaCy + numpy are intentionally omitted: security.redact() falls back
+# to its always-on regex net (email/phone/card/SSN) when Presidio isn't importable,
+# which keeps the image small and cold-starts fast. Add them back (+ standard-1
+# instance) if you want the full NER layer. langfuse/pytest are dev/optional.
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+openai==1.51.0
+httpx==0.27.2                 # openai 1.51 passes proxies= to httpx; httpx>=0.28 removed it → pin <0.28
+requests==2.32.3
+beautifulsoup4==4.12.3
+psycopg[binary]==3.2.3
+pgvector==0.3.6
+google-genai==0.3.0
+sqlglot==25.24.0

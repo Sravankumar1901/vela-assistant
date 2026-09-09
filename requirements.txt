@@ -1,0 +1,22 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+openai==1.51.0
+requests==2.32.3
+beautifulsoup4==4.12.3
+# --- Vector store + relational DB (Supabase Postgres + pgvector) ---
+psycopg[binary]==3.2.3
+pgvector==0.3.6
+# --- Embeddings (Google Gemini SDK fallback path; OpenAI-compat is the default) ---
+google-genai==0.3.0
+# --- Chat-to-SQL safety gate ---
+sqlglot==25.24.0
+# --- PII redaction ---
+numpy<2                       # spaCy/thinc are not yet numpy-2 compatible
+presidio-analyzer==2.2.355
+presidio-anonymizer==2.2.355
+spacy==3.7.5
+# --- Optional observability ---
+langfuse==2.53.9
+# --- Tests ---
+pytest==8.3.3

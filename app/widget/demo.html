@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>VELA AI Assistant — Demo</title>
+  <style>
+    body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:#0b0b0c;color:#eee;line-height:1.6}
+    .wrap{max-width:760px;margin:0 auto;padding:64px 24px}
+    h1{font-size:2.4rem;margin:0 0 8px}
+    .sub{color:#c8a24a;font-weight:600}
+    p{color:#bbb}
+    .pill{display:inline-block;background:#1c1c1e;border:1px solid #2a2a2c;border-radius:999px;padding:4px 12px;font-size:12px;margin:4px 6px 4px 0;color:#ddd}
+    code{background:#1c1c1e;padding:2px 6px;border-radius:6px;font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="sub">VELA · AI Assistant</p>
+    <h1>An assistant that knows your business — and answers customers 24/7.</h1>
+    <p>Grounded in your own content. Privacy-safe by design: customer PII is redacted before the model ever sees it, answers never hallucinate hours or prices, and every interaction is audited.</p>
+    <div>
+      <span class="pill">PII redacted pre-LLM</span>
+      <span class="pill">Grounded — no hallucination</span>
+      <span class="pill">Per-business isolation</span>
+      <span class="pill">Full audit trail</span>
+      <span class="pill">Self-hostable · open-source</span>
+    </div>
+    <p style="margin-top:32px">Tap the chat bubble &#8600; to try it.</p>
+  </div>
+  <!-- Demo tenant. In production, proxy the key server-side. -->
+  <script src="/static/widget.js" data-api="" data-key="bLJT_H8LJr8Rg1OwcCwzFemUlAb-_T35NzRRPSG-ymU" data-name="VELA"></script>
+</body>
+</html>

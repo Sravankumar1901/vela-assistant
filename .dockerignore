@@ -1,0 +1,24 @@
+# Keep the image small and secrets out of it.
+.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+.env
+.env.*
+data/
+tests/
+*.md
+.git/
+.gitignore
+node_modules/
+# Edge wrapper — built/run by wrangler, not needed inside the Python image.
+worker.mjs
+wrangler.jsonc
+package.json
+package-lock.json
+Dockerfile
+.dockerignore
+requirements.txt
+run-local.sh
+supabase_setup.sql
+migrations/

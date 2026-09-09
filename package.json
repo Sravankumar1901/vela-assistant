@@ -1,0 +1,17 @@
+{
+  "name": "vela-assistant-edge",
+  "private": true,
+  "type": "module",
+  "description": "Cloudflare Worker + Container edge wrapper for the VELA RAG backend.",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "secrets:list": "wrangler secret list"
+  },
+  "dependencies": {
+    "@cloudflare/containers": "^0.3.7"
+  },
+  "devDependencies": {
+    "wrangler": "^4.129.0"
+  }
+}

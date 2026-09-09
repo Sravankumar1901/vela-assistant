@@ -1,0 +1,37 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vela-assistant-api",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Serve the API on a subdomain of the existing Cloudflare zone. wrangler
+  // provisions the DNS record + cert automatically on deploy.
+  "routes": [{ "pattern": "api.byvela.online", "custom_domain": true }],
+
+  // Non-secret runtime config for the container (secrets go via `wrangler secret put`).
+  "vars": {
+    "LLM_BASE_URL": "https://generativelanguage.googleapis.com/v1beta/openai/",
+    "LLM_MODEL": "gemini-flash-lite-latest",
+    "EMBED_PROVIDER": "gemini",
+    "EMBED_MODEL": "gemini-embedding-001",
+    "ALLOWED_ORIGINS": "https://byvela.online"
+  },
+
+  // The FastAPI backend, built from ./Dockerfile. `basic` = 1 GiB (regex-only PII).
+  // Bump to "standard-1" (4 GiB) if you re-enable Presidio/spaCy.
+  "containers": [
+    {
+      "class_name": "VelaBackend",
+      "image": "./Dockerfile",
+      "instance_type": "basic",
+      "max_instances": 3
+    }
+  ],
+
+  "durable_objects": {
+    "bindings": [{ "class_name": "VelaBackend", "name": "VELA_BACKEND" }]
+  },
+
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["VelaBackend"] }]
+}
