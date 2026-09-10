@@ -1,8 +1,37 @@
 # VELA AI Business-Assistant
 
 A drop-in, **secured, open-source** AI chat widget that answers a business's customer questions —
-grounded in that business's own content, 24/7, privacy-safe. A sellable VELA product; the same
-RAG "brain" plugs into Vera (voice) later.
+grounded in that business's own content, 24/7, privacy-safe. The same RAG core also backs Vera,
+the voice agent.
+
+**Built and run solo.** I'm Sravan — founder and the only engineer at [VELA](https://byvela.online).
+Architecture, RAG pipeline, security model, database, deployment and the embeddable widget are all
+mine. This is a production system with paying-customer intent behind it, not a weekend demo: it is
+deployed on Cloudflare Containers at `api.byvela.online` and serves the live chat widget on
+byvela.online.
+
+### Engineering notes — the decisions worth reading
+If you're reviewing this as a work sample, these are the parts with real thinking in them:
+
+- **Anti-hallucination is enforced, not prompted.** Retrieval below a cosine-similarity floor
+  (`MIN_SCORE`) short-circuits to an "I don't know" deflection *before* the model is asked, so a
+  confident wrong answer is structurally hard rather than discouraged in a system prompt.
+- **PII is redacted before the model, not after.** Redaction sits between the user and the LLM, so
+  raw contact details never reach the provider, the embeddings, or the logs. Two modes: a regex net
+  for a business's own content (keeps brand/place names) and a Presidio NER pass for visitor input.
+- **Tenant isolation is enforced by the database.** Postgres Row-Level Security with a
+  server-derived `app.tenant_id` GUC — a compromised API key cannot read another tenant's rows,
+  because the isolation doesn't depend on application code being correct.
+- **Chat-to-SQL is gated by a parser, not a regex.** `app/core/sql_guard.py` parses candidate SQL
+  with sqlglot and enforces a function allow-list, a denied-column list, a `SELECT *` block and
+  alias-shadowing checks, then executes on a write-denied role inside a read-only transaction with
+  a row cap and statement timeout. It was adversarially tested against ~200 payloads; the
+  regressions that pass are in `tests/test_sql_guard.py`.
+- **SSRF guard on ingestion.** The crawler blocks link-local and private ranges (including cloud
+  metadata endpoints), refuses redirects, and caps response size and page count.
+- **53 passing tests** (3 skipped, they need live credentials), covering the SQL gate, the RAG/SQL router, privacy paths and integration.
+
+Known limits are documented honestly in `SECURITY.md` rather than omitted.
 
 ## What makes it different (the pitch)
 - **Grounded.** Answers only from the business's published content and says when it doesn't know; deflects to a human when unsure (→ lead capture). Like any LLM product it can still be wrong — clients review their content.
@@ -35,7 +64,7 @@ cp .env.example .env                          # then fill in the 3 keys below
 ```
 
 ### The 3 things you must set in `.env`
-1. `LLM_API_KEY` — a free **Groq** API key (console.groq.com).
+1. `LLM_API_KEY` — a **Google Gemini** API key (aistudio.google.com). Any OpenAI-compatible provider works via `LLM_BASE_URL`.
 2. `EMBED_API_KEY` — a **Google Gemini** API key (aistudio.google.com).
 3. `DATABASE_URL` — your **Supabase** Postgres connection URI.
 
